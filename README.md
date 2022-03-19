@@ -33,6 +33,8 @@ Usage
 
  - For first run, copy credentials.json file generated from Gmail API to the repository directory
  - For subsequent runs you can authenticate with the generated token.json file
+ - By default the permissons scope is set to readonly. This is to prevent potential disasters from happening.
+   - For write permissions scope, enable in ```gmail_deleter/client.py``` 
 
 
 Run deleter script with:
