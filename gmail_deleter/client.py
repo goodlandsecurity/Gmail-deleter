@@ -11,10 +11,10 @@ from googleapiclient.discovery import build
 # [*] Default is set to readonly to prevent potential disaster... only change if you fully understand what you are doing!
 
 # Read all resources and their metadata - no write operations.
-#SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
 
 # Full access to the account's mailboxes, including permanent deletion of threads and messages.
-SCOPES = ['https://mail.google.com/']
+# SCOPES = ['https://mail.google.com/']
 
 
 def get_credentials(credentials: Union[Path, str] = None, token: Union[Path, str] = None) -> Credentials:
