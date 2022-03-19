@@ -1,5 +1,6 @@
 import sys
 from argparse import ArgumentParser
+from itertools import tee
 
 from gmail_deleter import GmailHandler
 
@@ -38,8 +39,13 @@ def run(args):
                             delete = gmail.delete_message(user_id="me", msg_id=message['id'], soft_delete=True)
                         print(f"\n[!] Soft deleted messages that were labeled with the following labels: {labels}")
                     elif "hard" in delete_type.lower():
-                        message_ids = (i['id'] for i in messages)
-                        batch_delete = gmail.batch_delete_messages(user_id="me", msg_ids=list(message_ids))
+                        message_ids, message_ids_2 = tee(i['id'] for i in messages)
+                        if sum(1 for _ in message_ids) < 1000:
+                            batch_delete = gmail.batch_delete_messages(user_id="me", msg_ids=list(message_ids_2))
+                        else:
+                            for id in message_ids_2:
+                                delete = gmail.delete_message(user_id="me", msg_id=id, soft_delete=False)
+
                         print(f"\n[!] Hard deleted messages that were labeled with the following labels: {labels}")
                 except ValueError:
                     print("Invalid input! Try again.")
@@ -53,20 +59,32 @@ def run(args):
                             delete = gmail.delete_message(user_id="me", msg_id=message['id'], soft_delete=True)
                         print(f"\n[!] Soft deleted messages that matched query: {query}")
                     elif "hard" in delete_type.lower():
-                        query_msg_ids = (i['id'] for i in query_messages)
-                        batch_delete = gmail.batch_delete_messages(user_id="me", msg_ids=list(query_msg_ids))
+                        query_msg_ids, query_msg_ids_2 = tee(i['id'] for i in query_messages)
+                        if sum(1 for _ in query_msg_ids) < 1000:
+                            batch_delete = gmail.batch_delete_messages(user_id="me", msg_ids=list(query_msg_ids_2))
+                        else:
+                            for id in query_msg_ids_2:
+                                delete = gmail.delete_message(user_id="me", msg_id=id, soft_delete=False)
                         print(f"\n[!] Hard deleted messages that matched query: {query}")
                 except ValueError:
                     print("Invalid input! Try again.")
             elif choice == 5:
                 trash = gmail.list_messages_with_label(user_id="me", label_ids=["TRASH"])
-                trash_ids = (i['id'] for i in trash)
-                batch_delete = gmail.batch_delete_messages(user_id="me", msg_ids=list(trash_ids))
+                trash_ids, trash_ids_2 = tee(i['id'] for i in trash)
+                if sum(1 for _ in trash_ids) < 1000:
+                    batch_delete = gmail.batch_delete_messages(user_id="me", msg_ids=list(trash_ids_2))
+                else:
+                    for id in trash_ids_2:
+                        delete = gmail.delete_message(user_id="me", msg_id=id, soft_delete=False)
                 print("\n[!] Trash has been emptied!")
             elif choice == 6:
                 spam = gmail.list_messages_with_label(user_id="me", label_ids=["SPAM"])
-                spam_ids = (i['id'] for i in spam)
-                batch_delete = gmail.batch_delete_messages(user_id="me", msg_ids=list(spam_ids))
+                spam_ids, spam_ids_2 = tee(i['id'] for i in spam)
+                if sum(1 for _ in spam_ids) < 1000:
+                    batch_delete = gmail.batch_delete_messages(user_id="me", msg_ids=list(spam_ids_2))
+                else:
+                    for id in spam_ids_2:
+                        delete = gmail.delete_message(user_id="me", msg_id=id, soft_delete=False)
                 print("\n[!] Spam has been emptied!")
             elif choice == 7:
                 sys.exit(1)
@@ -79,7 +97,7 @@ def run(args):
 def main():
     parser = ArgumentParser(
         prog="Gmail Message Deleter",
-        description="No longer is there a need to manually delete your Gmail messages page by page! Programmatically clean your Gmail inbox and delete messages en masse by specific labels or Gmail search filter syntax!!"
+        description="No longer is there a need to manually delete your Gmail messages page by page! Programmatically clean your Gmail inbox and delete messages en masse by specific labels or Gmail search filter syntax!"
     )
     parser.add_argument("-c", "--credentials", dest="credentials_file", help="location of credentials.json file (required for first run!)", type=str)
     parser.add_argument("-t", "--token", dest="token_file", help="location of token.json file (once obtained, can be used to authenticate without supplying credentials.json)", type=str)
