@@ -66,7 +66,7 @@ The script provides the following options:
  - list authenticated user's email address and total number of messages in the mailbox
  - list all labels associated with the authenticated user's mailbox.
  - deletion of all messages with a specified label (Promotions, Forums, Social...)
-   - soft delete - (move to Trash
+   - soft delete - move to Trash
    - hard delete - permanently delete
  - deletion of all messages that match a specified Gmail search filter (e.g. from:user@domain.com)
    - soft delete - move to Trash
@@ -136,4 +136,4 @@ credentials.json file not found error
 ```
 - When running the deleter script, you might receive a file not found or no such file error regarding credentials.json.
 - This error occurs when you have not authorized the desktop application credentials as detailed in the Prerequisites section above. To learn how to create credentials for a desktop application, go to [Create credentials](https://developers.google.com/workspace/guides/create-credentials).
-- Once you create the credentials, make sure the downloaded JSON file is saved as credentials.json. Then move the file to your working directory with the rest of the sample quickstart code.
+- Once you create the credentials, make sure the downloaded JSON file is saved as credentials.json. Then move the file to the working directory with the deleter script.

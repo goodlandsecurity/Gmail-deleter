@@ -7,7 +7,9 @@ from gmail_deleter import GoogleClient
 
 
 class GmailHandler:
-    def __init__(self, credentials_filepath: Union[Path, str], token_filepath: Union[Path, str]):
+    def __init__(
+        self, credentials_filepath: Union[Path, str], token_filepath: Union[Path, str]
+    ):
         """
         Constructor for GmailHandler object which calls Gmail API endpoints.
 
@@ -17,7 +19,9 @@ class GmailHandler:
         """
         self.client = GoogleClient(credentials_filepath, token_filepath)
 
-    def delete_message(self, user_id: str, msg_id: str, soft_delete: bool = True) -> Dict[str, Union[str, List]] | str:
+    def delete_message(
+        self, user_id: str, msg_id: str, soft_delete: bool = True
+    ) -> Dict[str, Union[str, List]] | str:
         """Immediately delete a message with the given msg_id. Defaults to move to Trash (soft delete)
 
         Args:
@@ -30,10 +34,20 @@ class GmailHandler:
         """
         try:
             if soft_delete:
-                response = self.client.service.users().messages().trash(userId=user_id, id=msg_id).execute()
+                response = (
+                    self.client.service.users()
+                    .messages()
+                    .trash(userId=user_id, id=msg_id)
+                    .execute()
+                )
                 return response
             else:
-                response = self.client.service.users().messages().delete(userId=user_id, id=msg_id).execute()
+                response = (
+                    self.client.service.users()
+                    .messages()
+                    .delete(userId=user_id, id=msg_id)
+                    .execute()
+                )
                 return response
         except HttpError as error:
             raise f"An unhandled error occured: {error}"
@@ -49,7 +63,12 @@ class GmailHandler:
             An empty response upon successful deletion.
         """
         try:
-            response = self.client.service.users().messages().batchDelete(userId=user_id, body={"ids": msg_ids}).execute()
+            response = (
+                self.client.service.users()
+                .messages()
+                .batchDelete(userId=user_id, body={"ids": msg_ids})
+                .execute()
+            )
             return response
         except HttpError as error:
             raise f"An unhandled error occured: {error}"
@@ -75,11 +94,15 @@ class GmailHandler:
         Returns:
             A list of all labels in the user's mailbox
         """
-        label_result = self.client.service.users().labels().list(userId=user_id).execute()
+        label_result = (
+            self.client.service.users().labels().list(userId=user_id).execute()
+        )
         labels = label_result.get("labels", [])
         return labels
 
-    def list_messages_with_label(self, user_id: str, label_ids: List[str]) -> Generator[Dict[str, str], None, None]:
+    def list_messages_with_label(
+        self, user_id: str, label_ids: List[str]
+    ) -> Generator[Dict[str, str], None, None]:
         """List all messages of the user's mailbox with labelIds applied.
 
         Args:
@@ -90,21 +113,33 @@ class GmailHandler:
             Generator for dict of messages that have the required label(s) applied. Note that the returned dict contains only message ids and thread ids.
         """
         try:
-            response = self.client.service.users().messages().list(userId=user_id, labelIds=label_ids).execute()
+            response = (
+                self.client.service.users()
+                .messages()
+                .list(userId=user_id, labelIds=label_ids)
+                .execute()
+            )
             if "messages" in response:
-                for message in response['messages']:
+                for message in response["messages"]:
                     yield message
 
             while "nextPageToken" in response:
-                page_token = response['nextPageToken']
-                response = self.client.service.users().messages().list(userId=user_id, labelIds=label_ids, pageToken=page_token).execute()
+                page_token = response["nextPageToken"]
+                response = (
+                    self.client.service.users()
+                    .messages()
+                    .list(userId=user_id, labelIds=label_ids, pageToken=page_token)
+                    .execute()
+                )
                 if "messages" in response:
-                    for message in response['messages']:
+                    for message in response["messages"]:
                         yield message
         except HttpError as error:
             raise f"[*] An unhandled error occured: {error}"
 
-    def list_messages_matching_query(self, user_id: str, query: str = None) -> Generator[Dict[str, str], None, None]:
+    def list_messages_matching_query(
+        self, user_id: str, query: str = None
+    ) -> Generator[Dict[str, str], None, None]:
         """List all messages of the user's mailbox matching the query.
 
         Args:
@@ -115,21 +150,33 @@ class GmailHandler:
             Generator for dict of messages that match the criteria of the query. Note that the returned dict contains only message ids and thread ids.
         """
         try:
-            response = self.client.service.users().messages().list(userId=user_id, q=query).execute()
+            response = (
+                self.client.service.users()
+                .messages()
+                .list(userId=user_id, q=query)
+                .execute()
+            )
 
             if "messages" in response:
-                for message in response['messages']:
+                for message in response["messages"]:
                     yield message
 
             while "nextPageToken" in response:
-                page_token = response['nextPageToken']
-                response = self.client.service.users().messages().list(userId=user_id, q=query, pageToken=page_token).execute()
-                for message in response['messages']:
+                page_token = response["nextPageToken"]
+                response = (
+                    self.client.service.users()
+                    .messages()
+                    .list(userId=user_id, q=query, pageToken=page_token)
+                    .execute()
+                )
+                for message in response["messages"]:
                     yield message
         except HttpError as error:
             raise f"[*] An unhandled error occured: {error}"
 
-    def get_message(self, user_id: str, msg_id: str) -> Dict[str, Union[str, int, Dict, List]]:
+    def get_message(
+        self, user_id: str, msg_id: str
+    ) -> Dict[str, Union[str, int, Dict, List]]:
         """Get a message with a given id.
 
         Args:
@@ -140,7 +187,12 @@ class GmailHandler:
             A message.
         """
         try:
-            message = self.client.service.users().messages().get(userId=user_id, id=msg_id).execute()
+            message = (
+                self.client.service.users()
+                .messages()
+                .get(userId=user_id, id=msg_id)
+                .execute()
+            )
             return message
         except HttpError as error:
             raise f"An unhandled error occured: {error}"

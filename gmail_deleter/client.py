@@ -11,13 +11,15 @@ from googleapiclient.discovery import build
 # [*] Default is set to readonly to prevent potential disaster... only change if you fully understand what you are doing!
 
 # Read all resources and their metadata - no write operations.
-SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+SCOPES = ["https://www.googleapis.com/auth/gmail.readonly"]
 
 # Full access to the account's mailboxes, including permanent deletion of threads and messages.
 # SCOPES = ['https://mail.google.com/']
 
 
-def get_credentials(credentials: Union[Path, str] = None, token: Union[Path, str] = None) -> Credentials:
+def get_credentials(
+    credentials: Union[Path, str] = None, token: Union[Path, str] = None
+) -> Credentials:
     """Gets valid user credentials.
 
     If there is no token.json, or if token.json is invalid, the OAuth2 flow is completed to obtain new credentials. Must provide credentials.json!
@@ -44,17 +46,21 @@ def get_credentials(credentials: Union[Path, str] = None, token: Union[Path, str
                 raise "[*] You must provide credentials.json as client_secrets_file!"
         # save the credentials for the next run
         if not token:
-            with open('token.json', 'w') as t:
+            with open("token.json", "w") as t:
                 t.write(creds.to_json())
         else:
-            with open(token, 'w') as t:
+            with open(token, "w") as t:
                 t.write(creds.to_json())
 
     return creds
 
 
 class GoogleClient:
-    def __init__(self, credentials_filepath: Union[Path, str] = None, token_filepath: Union[Path, str] = None):
+    def __init__(
+        self,
+        credentials_filepath: Union[Path, str] = None,
+        token_filepath: Union[Path, str] = None,
+    ):
         """
         Constructor for GoogleClient object which calls Gmail API.
 
